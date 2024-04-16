@@ -73,6 +73,6 @@ config :foodtruckmatch, Oban,
     Oban.Plugins.Pruner,
     {Oban.Plugins.Cron,
      crontab: [
-       {"0 12 * * *", Foodtruckmatch.Workers.DailyLocationWorker},
+       {"0 4 * * *", Foodtruckmatch.Workers.DailyLocationWorker},
      ]}
   ]
