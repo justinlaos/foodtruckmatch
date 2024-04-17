@@ -9,13 +9,18 @@ defmodule FoodtruckmatchWeb.TruckLive.Show do
   end
 
   @impl true
+  def handle_params(%{"id" => id, "term" => term}, _, socket) do
+    {:noreply,
+     socket
+     |> assign(:truck, Location.get_truck!(id))
+     |> assign(:term, term)}
+  end
+
+  @impl true
   def handle_params(%{"id" => id}, _, socket) do
     {:noreply,
      socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:truck, Location.get_truck!(id))}
+     |> assign(:truck, Location.get_truck!(id))
+     |> assign(:term, nil)}
   end
-
-  defp page_title(:show), do: "Show Truck"
-  defp page_title(:edit), do: "Edit Truck"
 end

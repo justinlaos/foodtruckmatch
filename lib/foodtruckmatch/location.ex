@@ -7,6 +7,7 @@ defmodule Foodtruckmatch.Location do
   alias Foodtruckmatch.Repo
 
   alias Foodtruckmatch.Location.Truck
+  alias Foodtruckmatch.Location.Search
 
   @doc """
   Returns the list of trucks.
@@ -19,6 +20,11 @@ defmodule Foodtruckmatch.Location do
   """
   def list_trucks do
     Repo.all(Truck)
+  end
+
+  def filter_list_trucks(term) do
+    search_term = "%#{term}%"
+    from(t in Truck, where: like(t.items, ^search_term) ) |> Repo.all
   end
 
   @doc """
@@ -100,5 +106,9 @@ defmodule Foodtruckmatch.Location do
   """
   def change_truck(%Truck{} = truck, attrs \\ %{}) do
     Truck.changeset(truck, attrs)
+  end
+
+  def change_search(%Search{} = search, attrs \\ %{}) do
+    Search.changeset(search, attrs)
   end
 end

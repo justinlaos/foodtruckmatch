@@ -1,45 +1,28 @@
 <.header>
   Listing Trucks
-  <:actions>
-    <.link patch={~p"/trucks/new"}>
-      <.button>New Truck</.button>
-    </.link>
-  </:actions>
 </.header>
+
+<.live_component
+    module={FoodtruckmatchWeb.TruckLive.SearchComponent}
+    id={:new}
+    action={@live_action}
+    search={@search}
+    value={@search_term}
+/>
 
 <.table
   id="trucks"
   rows={@streams.trucks}
-  row_click={fn {_id, truck} -> JS.navigate(~p"/trucks/#{truck}") end}
+  row_click={if @search_term, do: (fn {_id, truck} -> JS.navigate(~p"/trucks/#{truck}?term=#{@search_term}") end), else: (fn {_id, truck} -> JS.navigate(~p"/trucks/#{truck}") end)}
 >
   <:col :let={{_id, truck}} label="Name"><%= truck.name %></:col>
   <:col :let={{_id, truck}} label="Address"><%= truck.address %></:col>
-  <:col :let={{_id, truck}} label="Latitude"><%= truck.latitude %></:col>
-  <:col :let={{_id, truck}} label="Longitude"><%= truck.longitude %></:col>
-  <:col :let={{_id, truck}} label="Items"><%= truck.items %></:col>
-  <:action :let={{_id, truck}}>
-    <div class="sr-only">
-      <.link navigate={~p"/trucks/#{truck}"}>Show</.link>
-    </div>
-    <.link patch={~p"/trucks/#{truck}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, truck}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: truck.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
+  <:col :let={{_id, truck}} label="Items">
+    <%= if @search_term do %>
+      <%= Phoenix.HTML.raw(String.replace(truck.items, ~r/#{@search_term}/i, fn match -> "<span class='bg-yellow-200 px-0.5'>" <> match <> "</span>" end)) %>
+    <% else %>
+      <%= truck.items %>
+    <% end %>
+  </:col>
 </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="truck-modal" show on_cancel={JS.patch(~p"/trucks")}>
-  <.live_component
-    module={FoodtruckmatchWeb.TruckLive.FormComponent}
-    id={@truck.id || :new}
-    title={@page_title}
-    action={@live_action}
-    truck={@truck}
-    patch={~p"/trucks"}
-  />
-</.modal>
